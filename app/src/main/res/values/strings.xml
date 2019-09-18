@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Lesson2_1</string>
+    <string name="edit_text_hint">Enter text here</string>
 </resources>
