@@ -9,6 +9,8 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
@@ -22,7 +24,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         textView = findViewById(R.id.textView);
-        final Observer<String> observer = new Observer<String>() {
+
+        Observer<String> observer = new Observer<String>() {
             @Override
             public void onSubscribe(Disposable d) {
             }
@@ -41,22 +44,27 @@ public class MainActivity extends AppCompatActivity {
         };
 
         editText = findViewById(R.id.editText);
-        editText.addTextChangedListener(new TextWatcher() {
+        Observable<String> observable = Observable.create(new ObservableOnSubscribe<String>() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            public void subscribe(final ObservableEmitter<String> emitter) {
+                editText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-            }
+                    }
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                Observable<String> observable = Observable.just(charSequence.toString());
-                observable.safeSubscribe(observer);
-            }
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        emitter.onNext(charSequence.toString());
+                    }
 
-            @Override
-            public void afterTextChanged(Editable editable) {
+                    @Override
+                    public void afterTextChanged(Editable editable) {
 
+                    }
+                });
             }
         });
+        observable.safeSubscribe(observer);
     }
 }
